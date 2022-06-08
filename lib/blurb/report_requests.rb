@@ -2,12 +2,12 @@ require 'blurb/request_collection_with_campaign_type'
 
 class Blurb
   class ReportRequests < RequestCollectionWithCampaignType
-    SD_TACTIC = 'T00020'.freeze
 
     def initialize(campaign_type:, base_url:, headers:)
       @campaign_type = campaign_type
       @base_url = "#{base_url}/v2/#{@campaign_type}"
       @headers = headers
+      @tactic = "T00020"
     end
 
     def create(
@@ -15,16 +15,18 @@ class Blurb
       report_date:,
       metrics: nil,
       segment: nil,
-      creative_type: nil
+      creative_type: nil,
+      tactic:: nil
     )
       # create payload
       metrics = get_default_metrics(record_type.to_s.underscore.to_sym, segment) if metrics.nil?
+      @tactic = tactic if !tactic.nil?
       payload = {
         metrics: metrics.map{ |m| m.to_s.camelize(:lower) }.join(","),
         report_date: report_date
       }
       payload[:segment] = segment if segment
-      payload[:tactic] = SD_TACTIC if @campaign_type.to_sym == :sd
+      payload[:tactic] = @tactic if @campaign_type.to_sym == :sd
       payload[:creative_type] = creative_type if creative_type
 
       execute_request(
