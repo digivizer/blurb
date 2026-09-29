@@ -1,3 +1,4 @@
+require "openssl"
 require "oauth2"
 require "blurb/client"
 require "blurb/profile"
@@ -102,7 +103,7 @@ class Blurb
           '',
           '',
           site: 'https://api.amazon.com',
-          ssl: { version: :TLSv1 }
+          ssl: { min_version: OpenSSL::SSL::TLS1_2_VERSION }
         )
       end
   end
